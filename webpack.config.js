@@ -3,11 +3,13 @@
 module.exports = {
 	mode: process.env.NODE_ENV || 'development',
 	entry: {
-		main: './main.js',
+		card_layer: './entry.js',
 	},
 	output: {
 		path: __dirname + '/dist',
-		filename: '[name].js'
+		filename: '[name].js',
+		library: 'CardLayer',
+		libraryTarget: 'umd',
 	},
 	// plugins: [
 	// 	new HtmlWebpackPlugin({
