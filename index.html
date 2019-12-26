@@ -6,16 +6,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
+    <style>
+        body {
+            background-color: burlywood;
+        }
+
+        .card-registered {
+            width: 100vw;
+            height: 100vh;
+            background-color: rgb(122, 202, 160);
+        }
+    </style>
 </head>
 
 <body>
-    <div class="card-register" data-card-name="test1">
+    <div class="card-register" data-card-name="test1" data-card-hide-area="right"
+        style="position: absolute;left:0px;top:0px;">
         A
     </div>
-    <div class="card-register" data-card-name="test2">
+    <div class="acard-register" data-card-name="test2" data-card-hide-area="right">
         B
     </div>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script> -->
+    <script src="./jquery.min.js"></script>
     <script src="./dist/card_layer.js"></script>
     <script src="./main.js"></script>
 </body>
