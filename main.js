@@ -5,19 +5,23 @@
 
 // レイヤー管理用.
 let leyerManager = new LayerManager();
-// DOM から検索してカードとして登録.
-leyerManager.adds(Card.searchCardRegisterFromDOM());
-console.log(leyerManager);
+$(function() {
+    // DOM から検索してカードとして登録.
+    leyerManager.adds(Card.searchCardRegisterFromDOM());
+    console.log(leyerManager);
 
+    leyerManager.layers.forEach(l => {
+        l.hide();
+    });
 
-
-let card = new Card('namae', {
-    selector: 'body',
-    name: 'namae',
-    isScrollable: false
+    // let card = new Card('namae', {
+    //     selector: 'body',
+    //     name: 'namae',
+    //     isScrollable: false
+    // });
+    //leyerManager.add(card);
+    console.log(leyerManager.layers);
 });
-leyerManager.add(card);
-console.log(leyerManager.layers);
 
 // leyerManager.
 // card.show()

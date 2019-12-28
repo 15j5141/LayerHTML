@@ -21,18 +21,22 @@ class Card extends Layer {
         // プロパティ初期化.
         /** @type {string} 非表示にした時画面中央に対して隠される場所. */
         this.hideArea = origin.hideArea;
-        /** @type {string} スワイプ可能か. */
-        this.isSwipeable = origin.isSwipeable;
-
-        /** @type {Object} */
-        this.touch = null;
-        this.basePosition = {
+        /** @type {Object} translateの値. */
+        this._deltaPosition = { x: 0, y: 0 };
+        /** @type {boolean} カード内でスクロール可能か. */
+        this._isScrollable = false;
+        /** @type {Object} 初期タッチを識別するためのオブジェクト. */
+        this._touch = null;
+        /** 画面左上からの初期位置. */
+        this._basePosition = {
             x: $(this.element).offset().left,
             y: $(this.element).offset().top
         };
-        this.deltaPosition = { x: 0, y: 0 };
+
+        // 初期値セット.
+        this.isSwipeable = origin.isSwipeable;
     }
-    /** @type {boolean} */
+    /** @type {boolean} スワイプ可能か. */
     get isSwipeable() { return this._isSwipeable; }
     set isSwipeable(arg) {
         this._isSwipeable = arg;
@@ -41,7 +45,7 @@ class Card extends Layer {
             $(this.element).on({
                 'touchstart.card': e => {
                     const t = e.changedTouches[0];
-                    this.touch = {
+                    this._touch = {
                         identiﬁer: t.identiﬁer,
                         pageX: t.pageX,
                         pageY: t.pageY,
@@ -49,44 +53,77 @@ class Card extends Layer {
                         startTop: $(e.target).offset().top,
                     };
                     console.log('touchstart', e);
+                    // 展開済みなら基本スクロール出来る.
+                    if (this.isOpened) {
+                        this._isScrollable = true;
+                    } else {
+                        this._isScrollable = false;
+                    }
+                    // 展開されていて上までスクロールされてればスワイプ可能に.
+                    // if (this.isOpened && ) {
+                    //     this._isScrollable = true;
+                    // }
+
                     // this.startPos.x = e.touches[0].pageX;
                     // this.startPos.y = e.touches[0].pageY;
                 },
                 'touchmove.card': e => {
-                    // console.log('touchmove', e, this.touch);
+                    console.log('touchmove');
                     // 移動したタッチイベントを取得.
                     let changed;
                     e.changedTouches.forEach(t => {
-                        if (t.identiﬁer === this.touch.identiﬁer) {
+                        if (t.identiﬁer === this._touch.identiﬁer) {
                             changed = t;
                             return;
                         }
                     });
                     // const x=changed.pageX-$(changed.target).offset().left;
-                    const vx = changed.pageX - this.touch.pageX;
-                    console.log(changed.pageX, this.touch.pageX, vx);
-                    this.move(this.touch.startLeft + vx, null);
-
-                    e.preventDefault();
+                    const vx = changed.pageX - this._touch.pageX;
+                    const vy = changed.pageY - this._touch.pageY;
+                    // console.log(changed.pageY, this._touch.pageY, vx);
+                    // スクロール不可なら.
+                    if (!this._isScrollable) {
+                        e.preventDefault(); // スクロールキャンセル.
+                        // スワイプさせる.
+                    }
+                    if (this.element.scrollTop <= 0) {
+                        this.move(this._touch.startLeft + vx, this._touch.startTop + vy);
+                    }
+                    // return false;
                 },
                 'touchend.card': e => {
                     console.log('touchend', e);
-                    const pos = this.deltaPosition;
-                    if (pos.x < window.innerWidth / 2) {
-                        this.move(0, null, true);
-                        // this.show();
+                    const pos = this._deltaPosition;
+                    if (this.hideArea === 'right' && pos.x < window.innerWidth / 2) {
+                        this.show();
+                    } else if (this.hideArea === 'down' && pos.y < window.innerHeight / 2) {
+                        this.show();
                     } else {
                         // this.move(window.innerWidth - 10, null, true);
                         this.hide();
                     }
+                },
+                'transitionend': e => {
+                    $(this.element).css('transition', '');
+                },
+                'scroll': e => {
+                    // e.preventDefault(); // スクロールキャンセル.
+                    if (!this.isOpened && !this._isScrollable) {
+                        // this.move(this._touch.startLeft + vx, this._touch.startTop + vy);
+                    }
                 }
             });
+            // this.element.addEventListener('scroll', Card.scrollCancel, { passive: false });
 
         } else {
             $(this.element).off('touchstart.card');
             $(this.element).off('touchmove.card');
             $(this.element).off('touchend.card');
         }
+        // $('body').on('touchmove.card', e => {
+        //     e.preventDefault();
+        // });
+
     }
     /**
      * jQuery で '.card-register' を探して登録する.
@@ -108,12 +145,26 @@ class Card extends Layer {
         }
         return list;
     }
-    show() {
+    // カードを完全に展開する.
+    show(hideArea) {
         // 移動位置.
+        const pos = hideArea || this.hideArea;
+        // this.isOpened = true;
+        switch (pos) {
+            case 'right':
+                this.move(0, null, true);
+                break;
+            case 'down':
+                this.move(null, 0, true);
+                break;
+            default:
+                break;
+        }
     }
     hide(hideArea) {
         // 移動位置.
         const pos = hideArea || this.hideArea;
+        // this.isOpened = false;
         const jq = $(this.element);
         const margin = 50;
         switch (pos) {
@@ -134,25 +185,49 @@ class Card extends Layer {
      */
     move(x, y, isSmoose) {
         const jq = $(this.element);
-        const vx = (x != null ? x : jq.offset().left) - this.basePosition.x;
-        const vy = (y != null ? y : jq.offset().top) - this.basePosition.y;
-        const css = {};
+        const vx = (x != null ? x : jq.offset().left) - this._basePosition.x;
+        const vy = (y != null ? y : jq.offset().top) - this._basePosition.y;
+        const pos = this.hideArea;
         console.log('move:' + vx + ',' + vy);
 
         if (isSmoose) {
-            jq.css('transition', "all 100ms 100ms ease");
+            jq.css('transition', "all 500ms 0ms ease");
         } else {
             jq.css('transition', '');
         }
-        this.deltaPosition = { x: vx, y: vy };
-        jq.css(
-            'transform',
-            'translate(' + parseInt(vx) + 'px,' + parseInt(vy) + 'px)'
-        );
-        jq.on('transitionend', e => {
-            jq.css('transition', '');
-        });
+        switch (pos) {
+            case 'right':
+                this._deltaPosition.x = vx > 0 ? vx : 0; // 0より小さければ0.
+                jq.css(
+                    'transform',
+                    'translate(' + parseInt(this._deltaPosition.x) + 'px,' + parseInt(this._deltaPosition.y) + 'px)'
+                );
+                break;
+            case 'down':
+                this._deltaPosition.y = vy > 0 ? vy : 0; // 0より小さければ0.
+                jq.css(
+                    'transform',
+                    'translate(' + parseInt(this._deltaPosition.x) + 'px,' + parseInt(this._deltaPosition.y) + 'px)'
+                );
+                break;
+            default:
+                console.log('error', pos);
 
+                break;
+        }
+
+    }
+    static scrollCancel(e) {
+        e.preventDefault();
+    }
+    get isOpened() {
+        return this._deltaPosition.y === 0 && this._deltaPosition.x === 0;
+        // translateを読み取る.
+    }
+    set _isOpened(param) {
+        if (param) {
+            this.show();
+        }
     }
 }
 export default Card;
