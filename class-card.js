@@ -137,7 +137,8 @@ class Card extends Layer {
             reg.classList.add('card-registered');
             const obj = {
                 name: reg.dataset.cardName, // data-card-name.
-                hideArea: reg.dataset.cardHideArea,
+                hideArea: reg.dataset.cardHideArea || 'down',
+                zIndex: reg.dataset.cardZ || 0, // 指定が無ければ0.
                 element: reg
             };
 

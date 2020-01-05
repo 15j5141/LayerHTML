@@ -15,6 +15,7 @@ class Layer {
             selector: '',
             parent: null,
             element: null,
+            zIndex: 0,
         };
         // 引数と合成.
         Object.assign(origin, args);
@@ -31,12 +32,12 @@ class Layer {
         this.html = origin.html;
         /** @type {string} */
         this.selector = origin.selector;
-        /** @type {LayerManager | Layer} */
+        /** @type {LayerManager | Layer} 親のレイヤ. */
         this.parent = origin.parent;
-        /** @type {Object} */
+        /** @type {Object} DOMエレメント. */
         this.element = origin.element;
-
-
+        /** @type {number} 奥行. 手前ほど大きな値. */
+        this.zIndex = origin.zIndex;
     }
 }
 export default Layer;
