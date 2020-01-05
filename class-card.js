@@ -13,7 +13,7 @@ class Card extends Layer {
         super(layerName, args); // Layerクラスの処理.
         const origin = {
             hideArea: '',
-            isSwipeable: true,
+            canSwipe: true,
         };
         // 合成.
         Object.assign(origin, args);
@@ -34,12 +34,12 @@ class Card extends Layer {
         };
 
         // 初期値セット.
-        this.isSwipeable = origin.isSwipeable;
+        this.canSwipe = origin.canSwipe;
     }
     /** @type {boolean} スワイプ可能か. */
-    get isSwipeable() { return this._isSwipeable; }
-    set isSwipeable(arg) {
-        this._isSwipeable = arg;
+    get canSwipe() { return this._canSwipe; }
+    set canSwipe(arg) {
+        this._canSwipe = arg;
         const $ = window.$;
         if (arg) {
             $(this.element).on({
