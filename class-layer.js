@@ -1,4 +1,3 @@
-import LayerManager from "./class-layer_manager";
 /**
  * @class Layer
  * @typedef {Object} Layer
@@ -32,12 +31,51 @@ class Layer {
         this.html = origin.html;
         /** @type {string} */
         this.selector = origin.selector;
-        /** @type {LayerManager | Layer} 親のレイヤ. */
+        /** @type {Layer} 親のレイヤ. */
         this.parent = origin.parent;
         /** @type {Object} DOMエレメント. */
         this.element = origin.element;
         /** @type {number} 奥行. 手前ほど大きな値. */
         this.zIndex = origin.zIndex;
+        /** @type {Layer[]} 子レイヤ. */
+        this.children = [];
+    }
+    getParent() {
+        return this.parent;
+    }
+    getChildren() {
+        return this.children;
+    }
+
+    /* -------------------- レイヤ管理系. -------------------- */
+    
+    /**
+     * @param {Layer} layer 
+     */
+    add(layer) {
+        layer.parent = this;
+        this.children.push(layer);
+    }
+    /**
+     * @param {Layer[]} layers 
+     */
+    adds(layers) {
+        console.log("adds;", layers);
+        layers.forEach(l => this.add(l));
+    }
+    /**
+     * @param {string} selector 
+     * @returns {Layer}
+     */
+    getBySelector(selector) {
+        return this.children.find(c => c.selector === selector);
+    }
+    /**
+     * @param {string} layerName 
+     * @returns {Layer}
+     */
+    getByName(layerName) {
+        return this.children.find(c => c.layerName === layerName);
     }
 }
 export default Layer;

@@ -1,16 +1,15 @@
 
 // import Card from "./class-card";
-// import LayerManager from "./class-layer_manager";
 // import Layer from "./class-layer";
 
 // レイヤー管理用.
-let leyerManager = new LayerManager();
+let leyerManager = new Layer();
 $(function() {
     // DOM から検索してカードとして登録.
     leyerManager.adds(Card.searchCardRegisterFromDOM());
     console.log(leyerManager);
 
-    leyerManager.layers.forEach(l => {
+    leyerManager.children.forEach(l => {
         l.hide();
     });
 
@@ -20,7 +19,7 @@ $(function() {
     //     isScrollable: false
     // });
     //leyerManager.add(card);
-    console.log(leyerManager.layers);
+    console.log(leyerManager.children);
 });
 
 // leyerManager.
