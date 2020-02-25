@@ -21,6 +21,8 @@ $(function() {
     //leyerManager.add(card);
     console.log(leyerManager.children);
 });
-
+$('#A-open').on('click', e => {
+    leyerManager.getByName('test1').show();
+});
 // leyerManager.
 // card.show()

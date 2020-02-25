@@ -32,6 +32,8 @@ class Card extends Layer {
             x: $(this.element).offset().left,
             y: $(this.element).offset().top
         };
+        /** @type {boolean} */
+        this._isSwipeable = false;
 
         // 初期値セット.
         this.canSwipe = origin.canSwipe;
@@ -59,6 +61,11 @@ class Card extends Layer {
                     } else {
                         this._isScrollable = false;
                     }
+                    if (this.element.scrollTop === 0) {
+                        this._isSwipeable = true;
+                    } else {
+                        this._isSwipeable = false;
+                    }
                     // 展開されていて上までスクロールされてればスワイプ可能に.
                     // if (this.isOpened && ) {
                     //     this._isScrollable = true;
@@ -82,11 +89,11 @@ class Card extends Layer {
                     const vy = changed.pageY - this._touch.pageY;
                     // console.log(changed.pageY, this._touch.pageY, vx);
                     // スクロール不可なら.
-                    if (!this._isScrollable) {
+                    if (!this._isScrollable || !this.isOpened) {
                         e.preventDefault(); // スクロールキャンセル.
                         // スワイプさせる.
                     }
-                    if (this.element.scrollTop <= 0) {
+                    if (this._isSwipeable && this.element.scrollTop <= 0) {
                         this.move(this._touch.startLeft + vx, this._touch.startTop + vy);
                     }
                     // return false;
@@ -96,7 +103,7 @@ class Card extends Layer {
                     const pos = this._deltaPosition;
                     if (this.hideArea === 'right' && pos.x < window.innerWidth / 2) {
                         this.show();
-                    } else if (this.hideArea === 'down' && pos.y < window.innerHeight / 2) {
+                    } else if (this.hideArea === 'down' && pos.y < window.innerHeight / 3 * 2) {
                         this.show();
                     } else {
                         // this.move(window.innerWidth - 10, null, true);
@@ -126,7 +133,7 @@ class Card extends Layer {
 
     }
     /**
-     * jQuery で '.card-register' を探して登録する.
+     * '.card-register' を探して登録する.
      */
     static searchCardRegisterFromDOM() {
         const registers = document.querySelectorAll('.card-register');
