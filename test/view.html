@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            margin: 0px;
+        }
+
+        .view-scene {
+            position: absolute;
+            top: 0px;
+            bottom: 0px;
+            left: 0px;
+            right: 0px;
+            margin: auto auto;
+            width: 99%;
+            height: 99%;
+            background-color: rgba(22, 22, 22, 0.2);
+        }
+
+        .view-root {
+            transition: linear 1s;
+        }
+    </style>
+
+</head>
+
+<body>
+    <!--
+    <div class="ui-scene" data-ui-id="scene1"></div>
+    <div> </div>
+    <script>
+        let views = [
+            { id: 'view1', view: new NavigationView(), withSelector: '#view1' },
+            { id: 'view2', view: new ModalView(), withURL: 'https://xxx.com/view2.html' },
+            {
+                id: 'view3', view: new View(
+                    {},
+                    {
+                        viewDidLoad: () => { }
+                    }
+                ),
+                withSelector: '#view3', withURL: 'https://'
+            },
+            { id: 'view4', view: new NavigationView(), withSelector: '#view4', withURL: 'https://' },
+        ];
+        let scene = new Scene({ id: 'scene1', views: views }); // id指定しなければ適当にDOM生成.
+        {
+            $(document).on('click', '#btn1', () => {
+                window.viewController.dismiss()
+            });
+            $(document).on('click', '#btn2', () => {
+                let view3 = window.viewController.scene.instantiateViewController({ withIdentifier: "view3" });
+                window.viewController.present(view3)
+            });
+        }
+    </script>
+    -->
+    <script src="../jquery.min.js"></script>
+    <script>
+        $(function () {
+            $('.view-root').css('transform', 'translate(10px,200px)')
+
+        });
+    </script>
+    <script type="module">
+        import Scene from "../class-scene.js";
+        import View from "../class-view.js";
+
+
+        var html = 'a<b>ただの文字</b>  ';
+
+        var blob = new Blob([html], { type: 'text/html' });
+        var url = URL.createObjectURL(blob);
+
+        let scene = new Scene();
+        let view = new View('../index.html');
+        scene.add(view);
+        console.log(view);
+
+    </script>
+</body>
+
+</html>
