@@ -4,22 +4,19 @@
  */
 class View {
   /**
-   * @param {string} src
    * @param {Object} event
    */
-  constructor(src = 'txtBlob or url', event) {
+  constructor(event) {
     /** @type {HTMLIFrameElement} */
     this.iframe;
     /** @type {Array<View>} */
-    this.subViews = [];
+    this.subViews_ = [];
     /** @type {View} 親View. */
     this.parentView;
     /** @type {boolean} */
     this.isInitialViewController = false;
     /** @const @type {string} */
     this.id;
-    /** @type {string} */
-    this.src_ = src;
     /** @type {HTMLElement} */
     this.rootElement;
     /** @type {any} ユーザーの扱える変数. */
@@ -44,16 +41,15 @@ class View {
    * @param {View} view
    */
   addSubview(view) {
-    this.subViews.push(view);
+    this.subViews_.push(view);
     view.parentView = this;
-    view.loadView(this.dom);
+    view.loadView();
     // 読込完了を通知.
     this.event_.viewDidLoad();
   }
   /**
-   * @param {HTMLElement} parentDOM
    */
-  loadView(parentDOM) {
+  loadView() {
     // DOM生成.
     this.rootElement = this.createHTML({
       tag: 'div',
@@ -64,62 +60,10 @@ class View {
         'background-color': 'rgba(50,50,50,0.5)',
         position: 'absolute',
       },
-      children: [
-        {
-          tag: 'div',
-          class: 'view-navigation_bar',
-          style: {
-            width: '100%',
-            height: '10%',
-            'background-color': 'green',
-          },
-          html: 'ナビゲーションバー',
-        },
-        {
-          tag: 'iframe',
-          class: 'view-body',
-          attr: {
-            src: this.src_,
-            frameborder: '1',
-          },
-          style: {
-            width: '100%',
-            height: '90%',
-          },
-        },
-        {
-          // pointer-eventsでの入力制限用.
-          tag: 'div',
-          class: 'view-overlap',
-          style: {
-            'pointer-events': 'none',
-            position: 'absolute',
-            height: '100%',
-            width: '100%',
-            left: '0',
-            top: '0',
-          },
-        },
-      ],
     }).get(0);
-    // DOM配置.
-    $(parentDOM).append(this.rootElement);
-
-    // DOM初期位置記録.
-    this.offset = this.rootElement.getBoundingClientRect();
-    console.log(this.offset);
 
     // 自由移動可能に.
     this.setMovable(this.rootElement);
-
-    this.iframe = $('iframe', this.rootElement).get(0);
-    const nav = $('.view-navigation_bar', this.rootElement);
-    // 最適サイズ調整.
-    $(this.iframe).css({
-      // height: $(this.rootElement).innerHeight() - nav.outerHeight() + 'px',
-    });
-    // 内部windowから参照できるように.
-    this.iframe.contentWindow.viewController = this;
   }
   /**
    * DOMを破棄.
@@ -130,6 +74,25 @@ class View {
     // this.parentViews.viewWillUnload();
     $(this.rootElement).remove();
     this.event_.viewDidUnload();
+  }
+  /**
+   * subViewsを配置.
+   */
+  layoutSubviews() {
+    // DOM配置.
+    const x = this.subViews_.map(view => {
+      view.layoutSubviews();
+      return view.rootElement;
+    });
+    $(this.rootElement)
+      .html('') // 空にする.
+      .append(
+        // 中に再配置.
+        ...x
+      );
+
+    // 通知.
+    this.viewDidLayoutSubviews();
   }
   /**
    * jQueryオブジェクトでHTMLDOMを生成する.
@@ -226,6 +189,17 @@ class View {
     $(dom).css({
       transform: 'translate(' + x + 'px,' + y + 'px)',
     });
+  }
+  /**
+   * layoutSubviews完了時呼ばれる.
+   */
+  viewDidLayoutSubviews() {
+    for (let i = 0; i < this.subViews_.length; i++) {
+      const view = this.subViews_[i];
+      // DOM初期位置記録.
+      view.offset = view.rootElement.getBoundingClientRect();
+      console.log(view.offset);
+    }
   }
 }
 export default View;

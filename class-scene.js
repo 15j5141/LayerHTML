@@ -31,7 +31,7 @@ class Scene extends View {
       _param.id = _param.withIdentifier;
       // DOMから検索してあれば.
     }
-    this.dom = $('<div>')
+    this.rootElement = $('<div>')
       .addClass('view-scene')
       .css({
         overflow: 'hidden',
@@ -41,14 +41,14 @@ class Scene extends View {
         left: '0px',
         right: '0px',
         margin: 'auto auto',
-        width: '100vw',
-        height: '100vh',
+        width: '100%',
+        height: '100%',
         'background-color': 'rgba(22, 22, 22, 0.1)',
         'pointer-events': 'none',
       })
       .get(0);
     $('body')
-      .append(this.dom)
+      .append(this.rootElement)
       .css({});
 
     this.id = _param.id;
@@ -80,6 +80,11 @@ class Scene extends View {
     $(view.rootElement).css({
       'pointer-events': 'auto',
     });
+  }
+  /**
+   */
+  init() {
+    this.layoutSubviews();
   }
 }
 export default Scene;

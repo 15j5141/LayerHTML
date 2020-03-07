@@ -70,10 +70,11 @@
 
         let scene = new Scene();
         let view1 = new ModalView('../index.html');
-        let view2 = new View('../index.html');
+        let view2 = new View();
         scene.add(view1);
-        scene.add(view2);
+        scene.init();
 
+        // scene.add(view2);
     </script>
 </body>
 
