@@ -5,6 +5,7 @@
   "main": "main.js",
   "scripts": {
     "build": "node ./node_modules/webpack/bin/webpack",
+    "watch": "node ./node_modules/webpack/bin/webpack --watch",
     "release": "NODE_ENV=production node ./node_modules/webpack/bin/webpack",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
