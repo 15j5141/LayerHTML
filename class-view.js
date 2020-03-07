@@ -181,15 +181,6 @@ class View {
     $(dom).on('mousemove.view touchmove.view', e => {
       if (!isMoving) return true;
       const nextMouseEvent = e;
-      /** 指定要素の矩形情報. */
-      const rect = dom.getBoundingClientRect();
-      /** 指定要素の親要素の矩形情報. */
-      const parentRect = dom.parentElement.getBoundingClientRect();
-      /** position:absolute指定時の(親要素からの)距離. */
-      const offsetWhenAbsolute = {
-        left: rect.left - parentRect.left + document.body.scrollLeft,
-        top: rect.top - parentRect.top + document.body.scrollTop,
-      };
       /** X移動量. */
       const dx =
         nextMouseEvent.clientX != null
@@ -202,6 +193,34 @@ class View {
           ? nextMouseEvent.clientY - lastMouseEvent.clientY
           : nextMouseEvent.changedTouches[0].clientY -
             lastMouseEvent.changedTouches[0].clientY;
+
+      this.move(dx, dy);
+
+      lastMouseEvent = nextMouseEvent;
+      return false;
+    });
+    $(document).on('mouseup.view touchend.view', e => {
+      isMoving = false;
+      return false;
+    });
+  }
+  /**
+   * @param {number} dx
+   * @param {number} dy
+   */
+  move(dx, dy) {
+    {
+      const dom = this.rootElement;
+      /** 指定要素の矩形情報. */
+      const rect = dom.getBoundingClientRect();
+      /** 指定要素の親要素の矩形情報. */
+      const parentRect = dom.parentElement.getBoundingClientRect();
+      /** position:absolute指定時の(親要素からの)距離. */
+      const offsetWhenAbsolute = {
+        left: rect.left - parentRect.left + document.body.scrollLeft,
+        top: rect.top - parentRect.top + document.body.scrollTop,
+      };
+
       // 移動. translateで移動する場合this.offsetで補正しないとleft:0px以外の時ずれる.
       $(dom).css({
         // left: offsetWhenAbsolute.left + dx + 'px',
@@ -213,13 +232,7 @@ class View {
           (offsetWhenAbsolute.top + dy - this.offset.top) +
           'px)',
       });
-      lastMouseEvent = nextMouseEvent;
-      return false;
-    });
-    $(document).on('mouseup.view touchend.view', e => {
-      isMoving = false;
-      return false;
-    });
+    }
   }
 }
 export default View;
