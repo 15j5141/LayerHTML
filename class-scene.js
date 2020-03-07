@@ -26,8 +26,6 @@ class Scene extends View {
     this.dom;
     /** @const @type {string} */
     this.id;
-    /** @type {Array<HTMLElement>} */
-    this.MovingDom = [];
 
     if (_param.withIdentifier == null) {
       _param.id = _param.withIdentifier;

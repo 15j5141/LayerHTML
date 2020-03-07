@@ -37,6 +37,7 @@ class View {
     };
     /** @type {DOMRect} DOM生成時初期位置. */
     this.offset = new DOMRect();
+    this.transform_ = { x: 0, y: 0 };
   }
   /**
    * 子Viewとして追加. 同時にDOM生成.
@@ -205,34 +206,26 @@ class View {
     });
   }
   /**
+   * transform相対値移動.
    * @param {number} dx
    * @param {number} dy
    */
   move(dx, dy) {
-    {
-      const dom = this.rootElement;
-      /** 指定要素の矩形情報. */
-      const rect = dom.getBoundingClientRect();
-      /** 指定要素の親要素の矩形情報. */
-      const parentRect = dom.parentElement.getBoundingClientRect();
-      /** position:absolute指定時の(親要素からの)距離. */
-      const offsetWhenAbsolute = {
-        left: rect.left - parentRect.left + document.body.scrollLeft,
-        top: rect.top - parentRect.top + document.body.scrollTop,
-      };
-
-      // 移動. translateで移動する場合this.offsetで補正しないとleft:0px以外の時ずれる.
-      $(dom).css({
-        // left: offsetWhenAbsolute.left + dx + 'px',
-        // top: offsetWhenAbsolute.top + dy + 'px',
-        transform:
-          'translate(' +
-          (offsetWhenAbsolute.left + dx - this.offset.left) +
-          'px,' +
-          (offsetWhenAbsolute.top + dy - this.offset.top) +
-          'px)',
-      });
-    }
+    this.transform_.x += dx;
+    this.transform_.y += dy;
+    this.moveTo(this.transform_.x, this.transform_.y);
+  }
+  /**
+   * transform絶対値移動.
+   * @param {number} x
+   * @param {number} y
+   */
+  moveTo(x, y) {
+    const dom = this.rootElement;
+    this.transform_ = { x: x, y: y };
+    $(dom).css({
+      transform: 'translate(' + x + 'px,' + y + 'px)',
+    });
   }
 }
 export default View;
