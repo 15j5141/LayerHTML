@@ -26,13 +26,32 @@ class Scene extends View {
     this.dom;
     /** @const @type {string} */
     this.id;
+    /** @type {Array<HTMLElement>} */
+    this.MovingDom = [];
 
     if (_param.withIdentifier == null) {
       _param.id = _param.withIdentifier;
       // DOMから検索してあれば.
     }
-    this.dom = $('<div>').addClass('view-scene');
-    $('body').append(this.dom);
+    this.dom = $('<div>')
+      .addClass('view-scene')
+      .css({
+        overflow: 'hidden',
+        position: 'absolute',
+        top: '0px',
+        bottom: '0px',
+        left: '0px',
+        right: '0px',
+        margin: 'auto auto',
+        width: '100vw',
+        height: '100vh',
+        'background-color': 'rgba(22, 22, 22, 0.1)',
+        'pointer-events': 'none',
+      })
+      .get(0);
+    $('body')
+      .append(this.dom)
+      .css({});
 
     this.id = _param.id;
   }
@@ -40,7 +59,7 @@ class Scene extends View {
    * @param {Object} param
    */
   instantiateViewController(param) {
-    const _param = {
+    const param_ = {
       withIdentifier: 'SecondVC',
       ...param,
     };
@@ -56,11 +75,13 @@ class Scene extends View {
     }
   }
   /**
-   * @param {View}
+   * @param {View} view
    */
   add(view) {
-    this.views.push(view);
-    view.loadView(this.dom);
+    this.addSubview(view);
+    $(view.rootElement).css({
+      'pointer-events': 'auto',
+    });
   }
 }
 export default Scene;

@@ -1,5 +1,7 @@
-import Card from './class-card.js';
-import Layer from './class-layer.js';
+// import Card from './class-card.js';
+// import Layer from './class-layer.js';
+const Layer = window.CardModule.Layer;
+const Card = window.CardModule.Card;
 
 // レイヤー管理用.
 const leyerManager = new Layer();

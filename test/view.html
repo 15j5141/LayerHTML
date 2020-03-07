@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 
 <head>
     <meta charset="UTF-8">
@@ -11,19 +11,11 @@
         }
 
         .view-scene {
-            position: absolute;
-            top: 0px;
-            bottom: 0px;
-            left: 0px;
-            right: 0px;
-            margin: auto auto;
-            width: 99%;
-            height: 99%;
-            background-color: rgba(22, 22, 22, 0.2);
+            /* */
         }
 
         .view-root {
-            transition: linear 1s;
+            /* transition: linear 1s; */
         }
     </style>
 
@@ -61,16 +53,15 @@
     </script>
     -->
     <script src="../jquery.min.js"></script>
+    <script src="../dist/card_layer.js"></script>
     <script>
-        $(function () {
-            $('.view-root').css('transform', 'translate(10px,200px)')
+        // import Scene from "../class-scene.js";
+        // import View from "../class-view.js";
+        // import ModalView from "../class-modal_view.js";
 
-        });
-    </script>
-    <script type="module">
-        import Scene from "../class-scene.js";
-        import View from "../class-view.js";
-
+        const Scene = window.CardModule.Scene;
+        const ModalView = window.CardModule.ModalView;
+        const View = window.CardModule.View;
 
         var html = 'a<b>ただの文字</b>  ';
 
@@ -78,9 +69,10 @@
         var url = URL.createObjectURL(blob);
 
         let scene = new Scene();
-        let view = new View('../index.html');
-        scene.add(view);
-        console.log(view);
+        let view1 = new ModalView('../index.html');
+        let view2 = new View('../index.html');
+        scene.add(view1);
+        scene.add(view2);
 
     </script>
 </body>
