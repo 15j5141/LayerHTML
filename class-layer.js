@@ -67,7 +67,6 @@ class Layer {
    * @param {Layer[]} layers
    */
   adds(layers) {
-    console.log('adds;', layers);
     layers.forEach(l => this.add(l));
   }
   /**

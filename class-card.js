@@ -210,7 +210,7 @@ class Card extends Layer {
     const vx = (x != null ? x : jq.offset().left) - this._basePosition.x;
     const vy = (y != null ? y : jq.offset().top) - this._basePosition.y;
     const pos = this.hideArea;
-    console.log('move:' + vx + ',' + vy);
+    // console.log('move:' + vx + ',' + vy);
 
     if (isSmoose) {
       jq.css('transition', 'all 500ms 0ms ease');
