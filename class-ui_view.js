@@ -12,11 +12,11 @@ class UIView {
     this.superview;
     this.uiWindow;
     /** @type {HTMLElement} */
-    this.rootElement;
+    this._rootElement;
     /** @type {any} ユーザーの扱える変数. */
-    this.publicData = {};
+    this._publicData = {};
     /** イベント登録. 未使用. */
-    this.event_ = {
+    this._event_ = {
       viewDidLoad: () => {},
       viewWillUnload: () => {},
       viewDidUnload: () => {},
@@ -26,12 +26,12 @@ class UIView {
       viewDidDisappear: () => {},
       ...event,
     };
-    this._transform = { x: 0, y: 0 };
+    this._transform_ = { x: 0, y: 0 };
     /** @type {DOMRect} DOM生成時初期位置. */
-    this.offset = new DOMRect();
+    this._offset = new DOMRect();
     this._isRedraw = false;
     /** _move()用. */
-    this.transform_ = { x: 0, y: 0 };
+    this._transform_ = { x: 0, y: 0 };
 
     this.setNeedsDisplay();
     this.init();
@@ -61,14 +61,14 @@ class UIView {
       },
     };
     // DOM生成.
-    this.rootElement = UIView.createHTML(obj_).get(0);
+    this._rootElement = UIView._createHTML(obj_).get(0);
   }
   /**
    * 再帰的にsubviewsを配置.
    */
   layoutSubviews() {
     // DOM配置.
-    $(this.rootElement)
+    $(this._rootElement)
       .html('') // 空にする.
       .append(
         // 中に再配置.
@@ -93,7 +93,7 @@ class UIView {
    * @param {Object} obj
    * @return {any}
    */
-  static createHTML(obj) {
+  static _createHTML(obj) {
     if (obj == null) return $('');
     const elementTag = obj.tag || 'div';
     const elementClass = obj.class || '';
@@ -104,7 +104,7 @@ class UIView {
     const elementChildren = obj.children || [];
 
     const elements = elementChildren.map(element => {
-      return UIView.createHTML(element); // 子要素を再帰的に生成.
+      return UIView._createHTML(element); // 子要素を再帰的に生成.
     });
 
     const jQueryObj = $('<' + elementTag + '>')
@@ -124,7 +124,7 @@ class UIView {
    * @param {HTMLElement} dom
    */
   setMovable(dom) {
-    if (dom == null) dom = this.rootElement;
+    if (dom == null) dom = this._rootElement;
     /** @type {MouseEvent} 開始時移動イベント. */
     let startMouseEvent;
     /** @type {MouseEvent} 前回移動イベント. */
@@ -152,7 +152,7 @@ class UIView {
           : nextMouseEvent.changedTouches[0].clientY -
             lastMouseEvent.changedTouches[0].clientY;
 
-      this.move(dx, dy);
+      this._move(dx, dy);
 
       lastMouseEvent = nextMouseEvent;
       return false;
@@ -167,19 +167,19 @@ class UIView {
    * @param {number} dx
    * @param {number} dy
    */
-  move(dx, dy) {
-    this.transform_.x += dx;
-    this.transform_.y += dy;
-    this.moveTo(this.transform_.x, this.transform_.y);
+  _move(dx, dy) {
+    this._transform_.x += dx;
+    this._transform_.y += dy;
+    this._moveTo(this._transform_.x, this._transform_.y);
   }
   /**
    * transform絶対値移動.
    * @param {number} x
    * @param {number} y
    */
-  moveTo(x, y) {
-    const dom = this.rootElement;
-    this.transform_ = { x: x, y: y };
+  _moveTo(x, y) {
+    const dom = this._rootElement;
+    this._transform_ = { x: x, y: y };
     $(dom).css({
       transform: 'translate(' + x + 'px,' + y + 'px)',
     });

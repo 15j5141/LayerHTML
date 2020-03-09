@@ -55,27 +55,11 @@
     <script src="../jquery.min.js"></script>
     <script src="../dist/card_layer.js"></script>
     <script>
-        // import Scene from "../class-scene.js";
-        // import View from "../class-view.js";
-        // import ModalView from "../class-modal_view.js";
-
-        const Scene = window.CardModule.Scene;
+        const UIWindow = window.CardModule.UIWindow;
         const ModalView = window.CardModule.ModalView;
-        const View = window.CardModule.View;
-
-        var html = 'a<b>ただの文字</b>  ';
-
-        var blob = new Blob([html], { type: 'text/html' });
-        var url = URL.createObjectURL(blob);
-
-        let scene = new Scene();
-        let view1 = new ModalView('../index.html');
-        let view2 = new View();
-        scene.add(view1);
-        scene.init();
-
-        // scene.add(view2);
+        const UIView = window.CardModule.UIView;
     </script>
+    <script type="module" src="./view_UIWebView.js"></script>
 </body>
 
 </html>

@@ -26,7 +26,7 @@ class UIWindow extends UIView {
       this.rootViewController.viewDidLoad();
 
       // 配置.
-      $('body').append(this.rootElement);
+      $('body').append(this._rootElement);
       this.addSubview(this.rootViewController.view);
       this.layoutSubviews();
     }
@@ -53,7 +53,7 @@ class UIWindow extends UIView {
       },
     };
     // DOM生成.
-    this.rootElement = UIView.createHTML(obj_).get(0);
+    this._rootElement = UIView._createHTML(obj_).get(0);
   }
 }
 export default UIWindow;

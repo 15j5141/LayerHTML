@@ -25,7 +25,7 @@ class UIWebView extends UIView {
   init(obj) {
     console.log(this.url_);
 
-    this.iframe = UIView.createHTML({
+    this.iframe = UIView._createHTML({
       tag: 'iframe',
       class: 'view-web_view view-root',
       attr: {
