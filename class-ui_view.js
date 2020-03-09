@@ -1,22 +1,16 @@
-// <reference types="JQuery.d.ts" />
 /**
  * 単位iframe.
  */
-class View {
+class UIView {
   /**
    * @param {Object} event
    */
   constructor(event) {
-    /** @type {HTMLIFrameElement} */
-    this.iframe;
     /** @type {Array<View>} */
-    this.subViews_ = [];
+    this.subviews = [];
     /** @type {View} 親View. */
-    this.parentView;
-    /** @type {boolean} */
-    this.isInitialViewController = false;
-    /** @const @type {string} */
-    this.id;
+    this.superview;
+    this.uiWindow;
     /** @type {HTMLElement} */
     this.rootElement;
     /** @type {any} ユーザーの扱える変数. */
@@ -32,74 +26,74 @@ class View {
       viewDidDisappear: () => {},
       ...event,
     };
+    this._transform = { x: 0, y: 0 };
     /** @type {DOMRect} DOM生成時初期位置. */
     this.offset = new DOMRect();
+    this._isRedraw = false;
+    /** _move()用. */
     this.transform_ = { x: 0, y: 0 };
+
+    this.setNeedsDisplay();
+    this.init();
   }
   /**
    * 子Viewとして追加. 同時にDOM生成.
-   * @param {View} view
+   * @param {UIView} view
    */
   addSubview(view) {
-    this.subViews_.push(view);
-    view.parentView = this;
-    view.loadView();
-    // 読込完了を通知.
-    this.event_.viewDidLoad();
+    this.subviews.push(view);
+    view.superview = this;
   }
   /**
+   * DOM 生成.
+   * @param {Object} obj
    */
-  loadView() {
-    // DOM生成.
-    this.rootElement = this.createHTML({
+  init(obj) {
+    const obj_ = obj || {
       tag: 'div',
       class: 'view-root',
       style: {
-        width: '100vw',
+        width: '100%',
         height: '100%',
         'background-color': 'rgba(50,50,50,0.5)',
-        position: 'absolute',
+        'pointer-events': 'auto',
+        // position: 'absolute',
       },
-    }).get(0);
-
-    // 自由移動可能に.
-    this.setMovable(this.rootElement);
+    };
+    // DOM生成.
+    this.rootElement = UIView.createHTML(obj_).get(0);
   }
   /**
-   * DOMを破棄.
-   */
-  unloadView() {
-    const $ = window.top.$;
-    this.event_.viewWillUnload();
-    // this.parentViews.viewWillUnload();
-    $(this.rootElement).remove();
-    this.event_.viewDidUnload();
-  }
-  /**
-   * subViewsを配置.
+   * 再帰的にsubviewsを配置.
    */
   layoutSubviews() {
     // DOM配置.
-    const x = this.subViews_.map(view => {
-      view.layoutSubviews();
-      return view.rootElement;
-    });
     $(this.rootElement)
       .html('') // 空にする.
       .append(
         // 中に再配置.
-        ...x
+        ...this.subviews.map(view => {
+          view.layoutSubviews();
+          return view._rootElement;
+        })
       );
-
-    // 通知.
-    this.viewDidLayoutSubviews();
   }
   /**
-   * jQueryオブジェクトでHTMLDOMを生成する.
+   * 描画する.
+   */
+  draw() {}
+  /**
+   * 要描画フラグをオンにする.
+   */
+  setNeedsDisplay() {
+    this._isRedraw = true;
+  }
+  /**
+   * jQueryオブジェクトでHTML DOMを生成する.
    * @param {Object} obj
    * @return {any}
    */
-  createHTML(obj) {
+  static createHTML(obj) {
     if (obj == null) return $('');
     const elementTag = obj.tag || 'div';
     const elementClass = obj.class || '';
@@ -110,7 +104,7 @@ class View {
     const elementChildren = obj.children || [];
 
     const elements = elementChildren.map(element => {
-      return this.createHTML(element); // 子要素を再帰的に生成.
+      return UIView.createHTML(element); // 子要素を再帰的に生成.
     });
 
     const jQueryObj = $('<' + elementTag + '>')
@@ -130,7 +124,7 @@ class View {
    * @param {HTMLElement} dom
    */
   setMovable(dom) {
-    if (dom == null) return;
+    if (dom == null) dom = this.rootElement;
     /** @type {MouseEvent} 開始時移動イベント. */
     let startMouseEvent;
     /** @type {MouseEvent} 前回移動イベント. */
@@ -190,16 +184,21 @@ class View {
       transform: 'translate(' + x + 'px,' + y + 'px)',
     });
   }
+  // 通知.
   /**
-   * layoutSubviews完了時呼ばれる.
+   * @param {UIView} view
    */
-  viewDidLayoutSubviews() {
-    for (let i = 0; i < this.subViews_.length; i++) {
-      const view = this.subViews_[i];
-      // DOM初期位置記録.
-      view.offset = view.rootElement.getBoundingClientRect();
-      console.log(view.offset);
-    }
-  }
+  didAddSubview(view) {}
+  /**
+   * @param {*} view
+   */
+  willRemoveSubview(view) {}
+  /**
+   * @param {UIView} view
+   */
+  willMove(view) {}
+  /**
+   */
+  didMove() {}
 }
-export default View;
+export default UIView;

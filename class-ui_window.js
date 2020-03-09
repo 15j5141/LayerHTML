@@ -1,39 +1,44 @@
-import View from './class-view.js';
+import UIView from './class-ui_view.js';
+import UIViewController from './class-ui_view_controller.js';
 /**
  * １つの画面的なもの. 複数配置可.
  */
-class Scene extends View {
+class UIWindow extends UIView {
   /**
-   * @param {Object} param
+   * @param {UIViewController} rootViewController
+   * @param {UIWindowScene} windowScene
    */
-  constructor(param) {
+  constructor(rootViewController, windowScene) {
     super();
-    const _param = {
-      withIdentifier: '', // scene_name
-      id: '',
-      ...param,
-    };
-    /** @type {Array<View>} 動的な実体. */
-    this.instance;
-    /** @type {Array<View>} 定義一覧. */
-    this.views = [];
-    /** @type {View} */
-    this.rootViewController;
-    /**
-     * 実際に存在するDOM.
-     * @type {HTMLDivElement}
-     */
-    this.dom;
+    /** @type {UIViewController} */
+    this.rootViewController = rootViewController;
+    /** @type {UIWindowScene} */
+    this.windowScene = windowScene;
+    this.windowLevel;
     /** @const @type {string} */
     this.id;
 
-    if (_param.withIdentifier == null) {
-      _param.id = _param.withIdentifier;
-      // DOMから検索してあれば.
+    if (this.rootViewController != null) {
+      // DOM 生成.
+      this.rootViewController.loadView();
+
+      // 読込完了を通知.
+      this.rootViewController.viewDidLoad();
+
+      // 配置.
+      $('body').append(this.rootElement);
+      this.addSubview(this.rootViewController.view);
+      this.layoutSubviews();
     }
-    this.rootElement = $('<div>')
-      .addClass('view-scene')
-      .css({
+  }
+  /**
+   * @override
+   */
+  init(obj) {
+    const obj_ = obj || {
+      tag: 'div',
+      class: 'view-window',
+      style: {
         overflow: 'hidden',
         position: 'absolute',
         top: '0px',
@@ -45,46 +50,10 @@ class Scene extends View {
         height: '100%',
         'background-color': 'rgba(22, 22, 22, 0.1)',
         'pointer-events': 'none',
-      })
-      .get(0);
-    $('body')
-      .append(this.rootElement)
-      .css({});
-
-    this.id = _param.id;
-  }
-  /**
-   * @param {Object} param
-   */
-  instantiateViewController(param) {
-    const param_ = {
-      withIdentifier: 'SecondVC',
-      ...param,
+      },
     };
-  }
-  /**
-   */
-  instantiateInitialViewController() {
-    const initView = this.instance.find(i => i.isInitialViewController);
-    if (initView == null) {
-      //
-    } else {
-      this.instantiateViewController(initView);
-    }
-  }
-  /**
-   * @param {View} view
-   */
-  add(view) {
-    this.addSubview(view);
-    $(view.rootElement).css({
-      'pointer-events': 'auto',
-    });
-  }
-  /**
-   */
-  init() {
-    this.layoutSubviews();
+    // DOM生成.
+    this.rootElement = UIView.createHTML(obj_).get(0);
   }
 }
-export default Scene;
+export default UIWindow;
